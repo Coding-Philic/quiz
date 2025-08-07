@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Quiz App Tailwind</title>
+    
+    <style>
+      .btn {
+        @apply bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition;
+      }
+      .option {
+        @apply border p-3 rounded cursor-pointer transition;
+      }
+      .option.correct {
+        @apply bg-green-100 border-green-500 text-green-700;
+      }
+      .option.wrong {
+        @apply bg-red-100 border-red-500 text-red-700;
+      }
+         /* Custom styles for .level-btn to reduce repeated Tailwind classes */
+    .level-btn {
+      @apply transition-all duration-200 border-2 border-gray-600 bg-black/50 hover:bg-indigo-500 hover:border-indigo-500 text-purple-200 font-semibold rounded-lg px-4 py-2 shadow;
+    }
+    .btn:disabled {
+      @apply bg-gray-900 bg-opacity-60 cursor-not-allowed;
+    }
+    .option {
+  @apply cursor-pointer w-full block border border-gray-600 rounded-lg px-4 py-2 bg-gray-700/80 hover:bg-indigo-600 transition-colors duration-150 text-gray-100 font-medium shadow text-left;
+}
+.option.correct {
+  @apply bg-green-600 border-green-400 text-white;
+}
+.option.wrong {
+  @apply bg-red-600 border-red-400 text-white;
+}
+      /* html body{
+        height: 100vh;
+        width: 100vw;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      } */
+    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+ <body class="bg-gradient-to-br from-gray-900 via-gray-800 to-black min-h-screen flex justify-center items-center font-sans p-6">
+  <div class="w-full max-w-md bg-black/80 backdrop-blur shadow-2xl rounded-2xl px-8 py-10 space-y-7 border border-gray-800">
+    <h1 class="text-4xl font-extrabold text-center mb-6 bg-gradient-to-r from-pink-400 via-purple-500 to-indigo-500 bg-clip-text text-transparent drop-shadow">Quiz App</h1>
+
+    <!-- Category Selection -->
+    <div id="category-box" class="space-y-4 text-center">
+      <h2 class="text-xl font-semibold text-gray-100 border-b border-gray-700 pb-2 tracking-wide">Select a Category</h2>
+      <div class="flex justify-center flex-wrap gap-4">
+        <button class="btn transition-all duration-200 border-2 border-indigo-400 text-indigo-200 bg-black/60 hover:bg-indigo-500 hover:text-white px-6 py-2 rounded-lg font-semibold shadow" onclick="selectCategory('tech')">
+          Tech
+        </button>
+        <button class="btn transition-all duration-200 border-2 border-pink-500 text-pink-200 bg-black/60 hover:bg-pink-500 hover:text-white px-6 py-2 rounded-lg font-semibold shadow" onclick="selectCategory('science')">
+          science
+        </button>
+        <button class="btn transition-all duration-200 border-2 border-yellow-500 text-yellow-200 bg-black/60 hover:bg-yellow-500 hover:text-white px-6 py-2 rounded-lg font-semibold shadow" onclick="selectCategory('management')">
+          management
+        </button>
+        <button class="btn transition-all duration-200 border-2 border-green-500 text-green-200 bg-black/60 hover:bg-green-500 hover:text-white px-6 py-2 rounded-lg font-semibold shadow" onclick="selectCategory('medical')">
+            medical
+        </button>
+        <button class="btn transition-all duration-200 border-2 border-red-500 text-red-200 bg-black/60 hover:bg-red-500 hover:text-white px-6 py-2 rounded-lg font-semibold shadow" onclick="selectCategory('aptitude')">
+          aptitude
+        </button>
+      </div>
+    </div>
+
+    <!-- Level Selection -->
+    <div id="level-box" class="hidden mt-6 text-center space-y-3">
+      <h2 class="text-xl font-semibold text-gray-100 border-b border-gray-700 pb-1">Select Level</h2>
+      <div class="flex flex-wrap gap-3 justify-center">
+        <button class="btn level-btn btn transition-all duration-200 border-2 border-pink-500 text-pink-200 bg-black/60 hover:bg-pink-500 hover:text-white px-6 py-2 rounded-lg font-semibold shadow" onclick="startQuiz(1)">Level 1</button>
+        <button class="btn level-btn btn transition-all duration-200 border-2 border-green-500 text-green-200 bg-black/60 hover:bg-green-500 hover:text-white px-6 py-2 rounded-lg font-semibold shadow" onclick="startQuiz(2)">Level 2</button>
+        <button class="btn level-btn btn transition-all duration-200 border-2 border-blue-500 text-blue-200 bg-black/60 hover:bg-blue-500 hover:text-white px-6 py-2 rounded-lg font-semibold shadow" onclick="startQuiz(3)">Level 3</button>
+        <button class="btn level-btn btn transition-all duration-200 border-2 border-yellow-500 text-yellow-200 bg-black/60 hover:bg-yellow-500 hover:text-white px-6 py-2 rounded-lg font-semibold shadow" onclick="startQuiz(4)">Level 4</button>
+        <button class="btn level-btn btn transition-all duration-200 border-2 border-red-500 text-red-200 bg-black/60 hover:bg-red-500 hover:text-white px-6 py-2 rounded-lg font-semibold shadow" onclick="startQuiz(5)">Level 5</button>
+      </div>
+    </div>
+
+    <!-- Quiz Box -->
+    <div id="quiz-box" class="hidden mt-6 space-y-4">
+      <h2 id="question-text" class="text-lg font-semibold text-gray-100"></h2>
+      <div id="options" style="color: white; padding: 4px; border-radius:10px;" class="space-y-2"></div>
+      <div id="reason-box" class="hidden bg-yellow-100 p-3 rounded-md text-sm"></div>
+      <div id="correctOption" class="hidden bg-blue-100 p-3 rounded-md text-sm font-semibold text-blue-800"></div>
+     
+      <button id="next-btn" onclick="nextQuestion()" class="btn h-10 w-20 rounded-xl mt-4 bg-gradient-to-r from-indigo-600 to-pink-500 text-white shadow font-bold transition-all duration-150 hover:scale-105 focus:outline-none disabled:bg-gray-600 disabled:opacity-60" disabled>Next</button>
+    </div>
+
+    <!-- Result Box -->
+    <div id="result-box" class="hidden text-center mt-8 space-y-4">
+      <h2 class="text-3xl font-extrabold bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent mb-2">Quiz Completed!</h2>
+      <p id="score-text" class="text-lg text-gray-200"></p>
+      <button onclick="restart()" class="btn bg-gradient-to-tr from-pink-500 to-purple-700 text-white px-7 py-2 rounded-lg font-semibold shadow hover:scale-105 transition-all duration-150">Start Over</button>
+    </div>
+  </div>
+
+ 
+</body>
+
+    <script src="script.js"></script>
+
+  </body>
+</html>
