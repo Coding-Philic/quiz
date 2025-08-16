@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Student Quiz App</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      margin: 0;
+      background: linear-gradient(120deg, #aeffe9 0%, #bea1fd 100%);
+      min-height: 100vh;
+    }
+
+    .center-rect {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: linear-gradient(135deg, #bbfcfb 0%, #00f8b2 100%);
+      border-radius: 20px;
+      box-shadow: 0 8px 32px #e0e0e0;
+      padding: 40px 28px;
+      min-width: 320px;
+      max-width: 420px;
+      text-align: center;
+      color: #555;
+      border: 2px solid #ffffff;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .correct {
+      color: #4caf50;
+      font-weight: bold;
+    }
+
+    .wrong {
+      color: #910707;
+      font-weight: bold;
+    }
+
+    .question {
+      margin-top: 20px;
+      background: linear-gradient(120deg, #e0c3fc 0%, #f8ffae 100%);
+      border-radius: 14px;
+      box-shadow: 0 2px 12px #e21515;
+      padding: 24px;
+      color: #555;
+      font-size: 1.1em;
+      border: 2px solid #fff;
+      position: relative;
+    }
+
+    .clock {
+      position: absolute;
+      top: 280px;
+      right: 10px;
+      font-size: 1.2em;
+      color: #e57373;
+      background: #fffde4;
+      border-radius: 50%;
+      padding: 8px 14px;
+      border: 2px solid #f8b500;
+      box-shadow: 0 2px 8px #eee;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .explanation {
+      margin-top: 10px;
+      font-style: italic;
+      color: #000;
+      font-size: 1em;
+    }
+
+    .option-btn {
+      margin: 10px 0;
+      padding: 10px 18px;
+      border-radius: 8px;
+      border: none;
+      background: linear-gradient(90deg, #fffde4 0%, #005aa7 100%);
+      color: #333;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.2s;
+      display: block;
+      width: 96%;
+      text-align: left;
+      font-size: 1em;
+      box-shadow: 0 2px 8px #eee;
+      border: 2px solid #fff;
+    }
+
+    .option-btn:hover {
+      background: linear-gradient(90deg, #f8ffae 0%, #a1c4fd 100%);
+      transform: scale(1.03);
+      color: #4caf50;
+    }
+
+    #score-bar {
+      width: 100%;
+      background: #fceabb;
+      border-radius: 10px;
+      margin: 20px 0;
+      border: 2px solid #fff;
+    }
+
+    #score-fill {
+      height: 28px;
+      background: linear-gradient(90deg, #a8edea 0%, #fed6e3 100%);
+      border-radius: 10px;
+      width: 0;
+      transition: width 1s;
+    }
+
+    #login-section,
+    #department-section,
+    #level-section,
+    #quiz-section {
+      max-width: 500px;
+      margin: auto;
+    }
+
+    #quiz-title {
+      font-size: 1.5em;
+      margin-bottom: 16px;
+      color: #f8b500;
+      font-weight: bold;
+      text-shadow: 1px 1px 2px #fff;
+    }
+
+    #login-error {
+      color: #e57373;
+      font-weight: bold;
+      margin-top: 10px;
+      background: #fffde4;
+      border-radius: 6px;
+      padding: 6px;
+      font-size: 1em;
+    }
+
+    #next-btn {
+      margin-top: 18px;
+      padding: 10px 24px;
+      border-radius: 8px;
+      border: none;
+      background: linear-gradient(90deg, #a8edea 0%, #fed6e3 100%);
+      color: #333;
+      font-weight: bold;
+      font-size: 1.1em;
+      cursor: pointer;
+      box-shadow: 0 2px 8px #eee;
+      border: 2px solid #fff;
+      transition: background 0.2s, transform 0.2s;
+    }
+
+    #next-btn:hover {
+      background: linear-gradient(90deg, #f1fcbb 0%, #5ff800 100%);
+      color: #4caf50;
+      transform: scale(1.05);
+    }
+
+    h2,
+    h3 {
+      color: #006cf8;
+      text-shadow: 1px 1px 2px #fff;
+    }
+
+    button {
+      outline: none;
+    }
+
+    input[type="text"],
+    input[type="password"] {
+      background: #fffde4;
+      color: #333;
+      border: 1px solid #f80000;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="login-section" class="center-rect">
+    <h2>Student Login</h2>
+    <input id="student-name" type="text" placeholder="Enter your name"
+      style="width:90%;margin-bottom:8px;padding:8px;border-radius:6px;border:1px solid #f8b500;"><br>
+    <input id="student-password" type="password" placeholder="Enter password"
+      style="width:90%;margin-bottom:8px;padding:8px;border-radius:6px;border:1px solid #f8b500;"><br>
+    <button onclick="login()"
+      style="padding:10px 24px;border-radius:8px;background:linear-gradient(90deg,#a8edea 0%,#fed6e3 100%);color:#333;font-weight:bold;font-size:1.1em;border:2px solid #fff;cursor:pointer;">Login</button>
+    <div id="login-error"></div>
+  </div>
+
+  <div id="department-section" class="hidden center-rect"
+    style="background:linear-gradient(135deg,#fffde4 0%,#a1c4fd 100%);color:#555;">
+    <h2>Select Section</h2>
+    <button onclick="selectDepartment('Computer Science')" class="option-btn"
+      style="background:linear-gradient(90deg,#fffde4 0%,#a1c4fd 100%);">Computer Science</button>
+    <button onclick="selectDepartment('Mathematics')" class="option-btn"
+      style="background:linear-gradient(90deg,#fceabb 0%,#f8b500 100%);">Mathematics</button>
+    <button onclick="selectDepartment('Physics')" class="option-btn"
+      style="background:linear-gradient(90deg,#a8edea 0%,#fed6e3 100%);">Physics</button>
+    <button onclick="selectDepartment('General Knowledge')" class="option-btn"
+      style="background:linear-gradient(90deg,#fed6e3 0%,#fffde4 100%);">General Knowledge</button>
+  </div>
+
+  <div id="level-section" class="hidden center-rect"
+    style="background:linear-gradient(135deg,#fceabb 0%,#a8edea 100%);color:#555;">
+    <h2>Select Level</h2>
+    <button onclick="selectLevel(0)" class="option-btn"
+      style="background:linear-gradient(90deg,#fffde4 0%,#a1c4fd 100%);">Level 1</button>
+    <button onclick="selectLevel(1)" class="option-btn"
+      style="background:linear-gradient(90deg,#fceabb 0%,#f8b500 100%);">Level 2</button>
+    <button onclick="selectLevel(2)" class="option-btn"
+      style="background:linear-gradient(90deg,#a8edea 0%,#fed6e3 100%);">Level 3</button>
+  </div>
+
+  <div id="quiz-section" class="hidden">
+    <div id="quiz-title"></div>
+    <div id="question-container"></div>
+  </div>
+  <script>
+    const students = [
+      { name: "Rajesh", password: "xyz234" },
+      { name: "Shivam", password: "xyz234" },
+      { name: "Zaid", password: "xyz234" },
+      { name: "Adnan", password: "xyz234" },
+      { name: "Deepak", password: "xyz234" },
+      { name: "Aishwarya", password: "xyz234" },
+      { name: "Anudesh", password: "xyz234" },
+      { name: "Aviral", password: "xyz234" },
+      { name: "Ayush", password: "xyz234" },
+      { name: "Chandan", password: "xyz234" },
+      { name: "Gurumit", password: "xyz234" },
+      { name: "Prinshi", password: "xyz234" },
+      { name: "Priya", password: "xyz234" },
+      { name: "Sujal", password: "xyz234" },
+      { name: "Sujeet", password: "xyz234" },
+      { name: "Uttkarsh", password: "xyz234" }
+    ];
+
+    // Each level has 10 questions now
+    const quizzes = {
+      "Computer Science": [
+        [
+          { question: "What does HTML stand for?", options: ["Hyper Trainer Marking Language", "Hyper Text Markup Language", "Hyper Text Marketing Language", "Hyper Text Markup Leveler"], answer: 1, explanation: "HTML stands for Hyper Text Markup Language." },
+          { question: "Which language is used for styling web pages?", options: ["HTML", "JQuery", "CSS", "XML"], answer: 2, explanation: "CSS is used for styling web pages." },
+          { question: "Which is not a JavaScript Framework?", options: ["Python Script", "JQuery", "Django", "NodeJS"], answer: 0, explanation: "Python Script is not a JavaScript framework." },
+          { question: "What does CSS stand for?", options: ["Cascading Style Sheets", "Colorful Style Sheets", "Computer Style Sheets", "Creative Style Sheets"], answer: 0, explanation: "CSS stands for Cascading Style Sheets." },
+          { question: "Which HTML tag is used to create a hyperlink?", options: ["<a>", "<link>", "<href>", "<hyperlink>"], answer: 0, explanation: "The <a> tag is used to create hyperlinks." },
+          { question: "Which HTML tag is used for images?", options: ["<img>", "<image>", "<src>", "<pic>"], answer: 0, explanation: "<img> is used for images." },
+          { question: "Which company developed JavaScript?", options: ["Microsoft", "Netscape", "Google", "Apple"], answer: 1, explanation: "JavaScript was developed by Netscape." },
+          { question: "Which symbol is used for comments in JavaScript?", options: ["//", "#", "<!-- -->", "**"], answer: 0, explanation: "// is used for single-line comments in JavaScript." },
+          { question: "Which method is used to print in JavaScript?", options: ["console.log()", "print()", "echo()", "write()"], answer: 0, explanation: "console.log() prints to the browser console." },
+          { question: "Which is a backend language?", options: ["HTML", "CSS", "Python", "JavaScript"], answer: 2, explanation: "Python is a backend language." }
+        ],
+        [
+          { question: "Which protocol is used to transfer web pages?", options: ["FTP", "SMTP", "HTTP", "TCP"], answer: 2, explanation: "HTTP is used for web pages." },
+          { question: "Which is a NoSQL database?", options: ["MySQL", "MongoDB", "Oracle", "PostgreSQL"], answer: 1, explanation: "MongoDB is a NoSQL database." },
+          { question: "Which HTML tag is used for tables?", options: ["<table>", "<tab>", "<tbl>", "<tb>"], answer: 0, explanation: "<table> is used for tables." },
+          { question: "Which is used for responsive design?", options: ["Bootstrap", "JQuery", "React", "Angular"], answer: 0, explanation: "Bootstrap is used for responsive design." },
+          { question: "Which is a JavaScript library?", options: ["Laravel", "Django", "JQuery", "Flask"], answer: 2, explanation: "JQuery is a JavaScript library." },
+          { question: "What is the value of π (pi) to two decimal places?", options: ["3.12", "3.14", "3.15", "3.16"], answer: 1, explanation: "π (pi) is approximately 3.14." },
+          { question: "What is the square root of 81?", options: ["9", "8", "7", "6"], answer: 0, explanation: "The square root of 81 is 9." },
+          { question: "What is 7 × 8?", options: ["54", "56", "58", "60"], answer: 1, explanation: "7 × 8 = 56." },
+          { question: "What is 12 + 15?", options: ["27", "25", "26", "28"], answer: 0, explanation: "12 + 15 = 27." },
+          { question: "What is 100 divided by 4?", options: ["20", "25", "24", "22"], answer: 1, explanation: "100 / 4 = 25." }
+        ],
+        [
+          { question: "What is the cube of 3?", options: ["6", "9", "27", "18"], answer: 2, explanation: "3 × 3 × 3 = 27." },
+          { question: "What is the next prime after 7?", options: ["9", "10", "11", "13"], answer: 2, explanation: "11 is the next prime after 7." },
+          { question: "What is 15% of 200?", options: ["20", "25", "30", "35"], answer: 2, explanation: "15% of 200 = 30." },
+          { question: "What is the perimeter of a square with side 5?", options: ["20", "25", "15", "10"], answer: 0, explanation: "Perimeter = 4 × side = 20." },
+          { question: "What is the area of a triangle with base 10 and height 5?", options: ["25", "30", "35", "40"], answer: 0, explanation: "Area = 0.5 × base × height = 25." },
+          { question: "What is the derivative of x^2?", options: ["x", "2x", "x^2", "2"], answer: 1, explanation: "The derivative of x^2 is 2x." },
+          { question: "What is the value of sin(90°)?", options: ["0", "1", "-1", "0.5"], answer: 1, explanation: "sin(90°) = 1." },
+          { question: "What is the solution to 2x + 3 = 7?", options: ["1", "2", "3", "4"], answer: 1, explanation: "2x + 3 = 7 ⇒ x = 2." },
+          { question: "What is the sum of angles in a triangle?", options: ["90°", "180°", "270°", "360°"], answer: 1, explanation: "Sum of angles in a triangle is 180°." },
+          { question: "What is the logarithm of 100 to base 10?", options: ["1", "2", "10", "100"], answer: 1, explanation: "log₁₀(100) = 2." }
+        ]
+      ],
+      // Add 10 questions for Mathematics, Physics, General Knowledge in similar way...
+      "Mathematics": [
+        [
+          { question: "What is 2 + 2?", options: ["3", "4", "5", "6"], answer: 1, explanation: "2 + 2 = 4." },
+          { question: "What is 5 × 6?", options: ["30", "35", "25", "40"], answer: 0, explanation: "5 × 6 = 30." },
+          { question: "What is the square root of 49?", options: ["6", "7", "8", "9"], answer: 1, explanation: "√49 = 7." },
+          { question: "What is 100 divided by 5?", options: ["15", "20", "25", "30"], answer: 2, explanation: "100 / 5 = 20." },
+          { question: "What is 9 × 9?", options: ["81", "72", "99", "90"], answer: 0, explanation: "9 × 9 = 81." },
+          { question: "What is 12 + 13?", options: ["24", "25", "26", "27"], answer: 1, explanation: "12 + 13 = 25." },
+          { question: "What is 7 × 7?", options: ["49", "56", "63", "77"], answer: 0, explanation: "7 × 7 = 49." },
+          { question: "What is 15 - 7?", options: ["8", "7", "6", "9"], answer: 0, explanation: "15 - 7 = 8." },
+          { question: "What is 8 × 5?", options: ["35", "40", "45", "50"], answer: 1, explanation: "8 × 5 = 40." },
+          { question: "What is 100 - 25?", options: ["75", "80", "85", "90"], answer: 0, explanation: "100 - 25 = 75." }
+        ],
+        [
+          { question: "What is the cube root of 27?", options: ["2", "3", "4", "5"], answer: 1, explanation: "∛27 = 3." },
+          { question: "What is 12 × 12?", options: ["124", "144", "134", "154"], answer: 1, explanation: "12 × 12 = 144." },
+          { question: "What is 50% of 200?", options: ["50", "100", "150", "200"], answer: 1, explanation: "50% of 200 = 100." },
+          { question: "What is 18 ÷ 3?", options: ["5", "6", "7", "8"], answer: 1, explanation: "18 ÷ 3 = 6." },
+          { question: "What is 7 × 8?", options: ["54", "56", "58", "60"], answer: 1, explanation: "7 × 8 = 56." },
+          { question: "What is 25 + 25?", options: ["50", "55", "60", "65"], answer: 0, explanation: "25 + 25 = 50." },
+          { question: "What is 100 ÷ 4?", options: ["20", "25", "24", "22"], answer: 1, explanation: "100 ÷ 4 = 25." },
+          { question: "What is 9 × 8?", options: ["72", "81", "90", "99"], answer: 0, explanation: "9 × 8 = 72." },
+          { question: "What is 11 × 11?", options: ["121", "111", "101", "131"], answer: 0, explanation: "11 × 11 = 121." },
+          { question: "What is 15 × 2?", options: ["25", "30", "35", "40"], answer: 1, explanation: "15 × 2 = 30." }
+        ],
+        [
+          { question: "What is the value of π (pi) to two decimal places?", options: ["3.12", "3.14", "3.15", "3.16"], answer: 1, explanation: "π (pi) is approximately 3.14." },
+          { question: "What is the square root of 81?", options: ["9", "8", "7", "6"], answer: 0, explanation: "The square root of 81 is 9." },
+          { question: "What is 7 × 8?", options: ["54", "56", "58", "60"], answer: 1, explanation: "7 × 8 = 56." },
+          { question: "What is 12 + 15?", options: ["27", "25", "26", "28"], answer: 0, explanation: "12 + 15 = 27." },
+          { question: "What is 100 divided by 4?", options: ["20", "25", "24", "22"], answer: 1, explanation: "100 / 4 = 25." },
+          { question: "What is the cube of 3?", options: ["6", "9", "27", "18"], answer: 2, explanation: "3 × 3 × 3 = 27." },
+          { question: "What is the next prime after 7?", options: ["9", "10", "11", "13"], answer: 2, explanation: "11 is the next prime after 7." },
+          { question: "What is 15% of 200?", options: ["20", "25", "30", "35"], answer: 2, explanation: "15% of 200 = 30." },
+          { question: "What is the perimeter of a square with side 5?", options: ["20", "25", "15", "10"], answer: 0, explanation: "Perimeter = 4 × side = 20." },
+          { question: "What is the area of a triangle with base 10 and height 5?", options: ["25", "30", "35", "40"], answer: 0, explanation: "Area = 0.5 × base × height = 25." }
+        ]
+      ],
+      "Physics": [
+        [
+          { question: "What is the unit of force?", options: ["Newton", "Joule", "Pascal", "Watt"], answer: 0, explanation: "The unit of force is Newton." },
+          { question: "Who discovered gravity?", options: ["Albert Einstein", "Isaac Newton", "Galileo", "Nikola Tesla"], answer: 1, explanation: "Isaac Newton discovered gravity." },
+          { question: "What is the speed of light?", options: ["3 × 10^8 m/s", "3 × 10^6 m/s", "3 × 10^5 m/s", "3 × 10^7 m/s"], answer: 0, explanation: "The speed of light is 3 × 10^8 meters per second." },
+          { question: "What is the unit of energy?", options: ["Joule", "Newton", "Pascal", "Watt"], answer: 0, explanation: "The unit of energy is Joule." },
+          { question: "What is the acceleration due to gravity on Earth?", options: ["9.8 m/s²", "8.9 m/s²", "10 m/s²", "9 m/s²"], answer: 0, explanation: "Acceleration due to gravity is 9.8 m/s²." },
+          { question: "What is the SI unit of electric current?", options: ["Ampere", "Volt", "Ohm", "Watt"], answer: 0, explanation: "SI unit of electric current is Ampere." },
+          { question: "Who invented the telephone?", options: ["Alexander Graham Bell", "Isaac Newton", "Albert Einstein", "Nikola Tesla"], answer: 0, explanation: "Alexander Graham Bell invented the telephone." },
+          { question: "What is the boiling point of water?", options: ["100°C", "90°C", "80°C", "120°C"], answer: 0, explanation: "Boiling point of water is 100°C." },
+          { question: "Which planet is known as the Red Planet?", options: ["Mars", "Venus", "Jupiter", "Saturn"], answer: 0, explanation: "Mars is known as the Red Planet." },
+          { question: "What is the chemical symbol for gold?", options: ["Au", "Ag", "Gd", "Go"], answer: 0, explanation: "Chemical symbol for gold is Au." }
+        ],
+        [
+          { question: "What is the formula for kinetic energy?", options: ["mv", "1/2 mv^2", "mgh", "mg"], answer: 1, explanation: "Kinetic energy = 1/2 mv^2." },
+          { question: "Who proposed the theory of relativity?", options: ["Isaac Newton", "Albert Einstein", "Galileo", "Nikola Tesla"], answer: 1, explanation: "Albert Einstein proposed the theory of relativity." },
+          { question: "What is the unit of frequency?", options: ["Hertz", "Joule", "Newton", "Watt"], answer: 0, explanation: "Unit of frequency is Hertz." },
+          { question: "What is the value of gravitational constant (G)?", options: ["6.67 × 10^-11 N m²/kg²", "9.8 m/s²", "3 × 10^8 m/s", "1.6 × 10^-19 C"], answer: 0, explanation: "G = 6.67 × 10^-11 N m²/kg²." },
+          { question: "What is the main gas in Earth's atmosphere?", options: ["Oxygen", "Nitrogen", "Carbon Dioxide", "Hydrogen"], answer: 1, explanation: "Nitrogen is the main gas in Earth's atmosphere." },
+          { question: "What is the formula for potential energy?", options: ["mgh", "mv", "1/2 mv^2", "mg"], answer: 0, explanation: "Potential energy = mgh." },
+          { question: "What is the SI unit of pressure?", options: ["Pascal", "Newton", "Joule", "Watt"], answer: 0, explanation: "SI unit of pressure is Pascal." },
+          { question: "Who discovered X-rays?", options: ["Wilhelm Röntgen", "Marie Curie", "Isaac Newton", "Albert Einstein"], answer: 0, explanation: "Wilhelm Röntgen discovered X-rays." },
+          { question: "What is the speed of sound in air?", options: ["343 m/s", "300 m/s", "400 m/s", "500 m/s"], answer: 0, explanation: "Speed of sound in air is 343 m/s." },
+          { question: "What is the unit of electric resistance?", options: ["Ohm", "Volt", "Ampere", "Watt"], answer: 0, explanation: "Unit of resistance is Ohm." }
+        ],
+        [
+          { question: "What is the value of Planck's constant?", options: ["6.626 × 10^-34 Js", "9.8 m/s²", "3 × 10^8 m/s", "1.6 × 10^-19 C"], answer: 0, explanation: "Planck's constant = 6.626 × 10^-34 Js." },
+          { question: "Who discovered radioactivity?", options: ["Marie Curie", "Isaac Newton", "Albert Einstein", "Nikola Tesla"], answer: 0, explanation: "Marie Curie discovered radioactivity." },
+          { question: "What is the unit of power?", options: ["Watt", "Joule", "Newton", "Pascal"], answer: 0, explanation: "Unit of power is Watt." },
+          { question: "What is the formula for force?", options: ["F = ma", "F = mg", "F = mv", "F = mgh"], answer: 0, explanation: "Force = mass × acceleration (F = ma)." },
+          { question: "What is the unit of charge?", options: ["Coulomb", "Ampere", "Volt", "Ohm"], answer: 0, explanation: "Unit of charge is Coulomb." },
+          { question: "Who invented the electric bulb?", options: ["Thomas Edison", "Nikola Tesla", "Isaac Newton", "Albert Einstein"], answer: 0, explanation: "Thomas Edison invented the electric bulb." },
+          { question: "What is the boiling point of water in Kelvin?", options: ["373 K", "273 K", "100 K", "473 K"], answer: 0, explanation: "Boiling point of water is 373 K." },
+          { question: "What is the SI unit of temperature?", options: ["Kelvin", "Celsius", "Fahrenheit", "Rankine"], answer: 0, explanation: "SI unit of temperature is Kelvin." },
+          { question: "What is the main component of the sun?", options: ["Hydrogen", "Oxygen", "Nitrogen", "Carbon"], answer: 0, explanation: "Sun is mainly composed of Hydrogen." },
+          { question: "What is the value of acceleration due to gravity on Moon?", options: ["1.62 m/s²", "9.8 m/s²", "3.7 m/s²", "0.98 m/s²"], answer: 0, explanation: "Gravity on Moon is 1.62 m/s²." }
+        ]
+      ],
+      "General Knowledge": [
+        [
+          { question: "What is the capital of India?", options: ["Mumbai", "Delhi", "Kolkata", "Chennai"], answer: 1, explanation: "Delhi is the capital of India." },
+          { question: "Who is known as the Father of the Nation in India?", options: ["Jawaharlal Nehru", "Mahatma Gandhi", "Sardar Patel", "Subhash Chandra Bose"], answer: 1, explanation: "Mahatma Gandhi is the Father of the Nation." },
+          { question: "Which is the largest continent?", options: ["Africa", "Asia", "Europe", "Australia"], answer: 1, explanation: "Asia is the largest continent." },
+          { question: "Which is the longest river in the world?", options: ["Amazon", "Nile", "Yangtze", "Mississippi"], answer: 1, explanation: "Nile is the longest river." },
+          { question: "Who wrote the national anthem of India?", options: ["Rabindranath Tagore", "Bankim Chandra Chatterjee", "Sarojini Naidu", "Subhash Chandra Bose"], answer: 0, explanation: "Rabindranath Tagore wrote the national anthem." },
+          { question: "Which planet is known as the Blue Planet?", options: ["Mars", "Earth", "Venus", "Jupiter"], answer: 1, explanation: "Earth is known as the Blue Planet." },
+          { question: "Who invented the light bulb?", options: ["Thomas Edison", "Alexander Graham Bell", "Nikola Tesla", "Isaac Newton"], answer: 0, explanation: "Thomas Edison invented the light bulb." },
+          { question: "Which is the largest ocean?", options: ["Atlantic", "Indian", "Pacific", "Arctic"], answer: 2, explanation: "Pacific Ocean is the largest." },
+          { question: "Who is the current President of India (2025)?", options: ["Ram Nath Kovind", "Draupadi Murmu", "Pranab Mukherjee", "Narendra Modi"], answer: 1, explanation: "Draupadi Murmu is the President (2025)." },
+          { question: "Which country is called the Land of Rising Sun?", options: ["China", "Japan", "Thailand", "South Korea"], answer: 1, explanation: "Japan is called the Land of Rising Sun." }
+        ],
+        [
+          { question: "Which is the smallest bone in human body?", options: ["Stapes", "Femur", "Tibia", "Fibula"], answer: 0, explanation: "Stapes is the smallest bone." },
+          { question: "Who discovered penicillin?", options: ["Alexander Fleming", "Marie Curie", "Louis Pasteur", "Isaac Newton"], answer: 0, explanation: "Alexander Fleming discovered penicillin." },
+          { question: "Which is the largest desert in the world?", options: ["Sahara", "Gobi", "Kalahari", "Arctic"], answer: 0, explanation: "Sahara is the largest desert." },
+          { question: "Which is the fastest land animal?", options: ["Lion", "Cheetah", "Tiger", "Leopard"], answer: 1, explanation: "Cheetah is the fastest land animal." },
+          { question: "Who painted the Mona Lisa?", options: ["Vincent van Gogh", "Leonardo da Vinci", "Pablo Picasso", "Michelangelo"], answer: 1, explanation: "Leonardo da Vinci painted the Mona Lisa." },
+          { question: "Which is the largest country by area?", options: ["China", "Russia", "USA", "Canada"], answer: 1, explanation: "Russia is the largest country by area." },
+          { question: "Who invented the telephone?", options: ["Alexander Graham Bell", "Thomas Edison", "Nikola Tesla", "Isaac Newton"], answer: 0, explanation: "Alexander Graham Bell invented the telephone." },
+          { question: "Which is the smallest continent?", options: ["Australia", "Europe", "Antarctica", "Africa"], answer: 0, explanation: "Australia is the smallest continent." },
+          { question: "Which is the largest mammal?", options: ["Elephant", "Blue Whale", "Giraffe", "Hippopotamus"], answer: 1, explanation: "Blue Whale is the largest mammal." },
+          { question: "Who is the founder of Microsoft?", options: ["Steve Jobs", "Bill Gates", "Mark Zuckerberg", "Larry Page"], answer: 1, explanation: "Bill Gates is the founder of Microsoft." }
+        ],
+        [
+          { question: "Which is the highest mountain in the world?", options: ["K2", "Kangchenjunga", "Mount Everest", "Lhotse"], answer: 2, explanation: "Mount Everest is the highest mountain." },
+          { question: "Who wrote 'Romeo and Juliet'?", options: ["William Shakespeare", "Charles Dickens", "Jane Austen", "Mark Twain"], answer: 0, explanation: "William Shakespeare wrote 'Romeo and Juliet'." },
+          { question: "Which is the largest island?", options: ["Greenland", "Australia", "Madagascar", "Borneo"], answer: 0, explanation: "Greenland is the largest island." },
+          { question: "Which is the longest wall in the world?", options: ["Berlin Wall", "Great Wall of China", "Hadrian's Wall", "Western Wall"], answer: 1, explanation: "Great Wall of China is the longest wall." },
+          { question: "Who discovered gravity?", options: ["Isaac Newton", "Albert Einstein", "Galileo", "Nikola Tesla"], answer: 0, explanation: "Isaac Newton discovered gravity." },
+          { question: "Which is the largest flower?", options: ["Rose", "Sunflower", "Rafflesia", "Lily"], answer: 2, explanation: "Rafflesia is the largest flower." },
+          { question: "Who is the author of 'Harry Potter'?", options: ["J.K. Rowling", "Stephen King", "Agatha Christie", "Dan Brown"], answer: 0, explanation: "J.K. Rowling is the author of 'Harry Potter'." },
+          { question: "Which is the smallest planet in the solar system?", options: ["Mercury", "Venus", "Mars", "Pluto"], answer: 0, explanation: "Mercury is the smallest planet." },
+          { question: "Which is the largest bird?", options: ["Eagle", "Ostrich", "Peacock", "Penguin"], answer: 1, explanation: "Ostrich is the largest bird." },
+          { question: "Who invented the computer?", options: ["Charles Babbage", "Alan Turing", "Bill Gates", "Steve Jobs"], answer: 0, explanation: "Charles Babbage invented the computer." }
+        ]
+      ]
+    };
+
+    let currentStudent = null;
+    let currentDepartment = null;
+    let currentLevel = 0;
+    let currentQuiz = [];
+    let currentQuestion = 0;
+    let score = 0;
+    let answered = [];
+    let timerInterval = null;
+    let timerTimeout = null;
+
+    // Track attempted sections and scores per student
+    let studentAttempts = {};
+
+    function login() {
+      const name = document.getElementById('student-name').value.trim().toLowerCase();
+      const password = document.getElementById('student-password').value;
+      const found = students.find(s => s.name.trim().toLowerCase() === name && s.password === password);
+      if (found) {
+        currentStudent = found;
+        // Initialize attempts for this student if not present
+        if (!studentAttempts[currentStudent.name]) {
+          studentAttempts[currentStudent.name] = [];
+        }
+        // If attempted 3 sections, show scores and block further access
+        if (studentAttempts[currentStudent.name].length >= 3) {
+          showPreviousScores();
+        } else {
+          document.getElementById('login-section').classList.add('hidden');
+          document.getElementById('department-section').classList.remove('hidden');
+          document.getElementById('login-error').textContent = '';
+        }
+      } else {
+        document.getElementById('login-error').textContent = 'Invalid name or password!';
+      }
+    }
+
+    function selectDepartment(dept) {
+      currentDepartment = dept;
+      document.getElementById('department-section').classList.add('hidden');
+      document.getElementById('level-section').classList.remove('hidden');
+    }
+
+    function selectLevel(level) {
+      currentLevel = level;
+      currentQuiz = quizzes[currentDepartment][currentLevel];
+      currentQuestion = 0;
+      score = 0;
+      answered = Array(currentQuiz.length).fill(null);
+      document.getElementById('level-section').classList.add('hidden');
+      document.getElementById('quiz-section').classList.remove('hidden');
+      document.getElementById('quiz-title').textContent = `${currentDepartment} - Level ${currentLevel + 1}`;
+      showQuestion();
+    }
+
+    function showQuestion() {
+      clearTimers();
+      const q = currentQuiz[currentQuestion];
+      const alphabet = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+      let html = `<div class="question"><b>Q${currentQuestion + 1}: ${q.question}</b><br>`;
+      q.options.forEach((opt, idx) => {
+        let disabled = answered[currentQuestion] !== null ? "disabled" : "";
+        html += `<button class="option-btn" ${disabled} onclick="checkAnswer(${idx})">${alphabet[idx]}. ${opt}</button>`;
+      });
+      html += `<div class="clock"><span>&#128337;</span> <span id="time-left">30</span> sec</div>`;
+      html += `<div id="feedback"></div><div id="explanation"></div>`;
+      html += `</div>`;
+      document.getElementById('question-container').innerHTML = html;
+
+      if (answered[currentQuestion] !== null) {
+        showFeedback(answered[currentQuestion]);
+      } else {
+        startTimer();
+      }
+    }
+
+    function startTimer() {
+      let time = 20;
+      document.getElementById('time-left').textContent = time;
+      timerInterval = setInterval(() => {
+        time--;
+        document.getElementById('time-left').textContent = time;
+        if (time <= 0) {
+          clearInterval(timerInterval);
+        }
+      }, 1000);
+      timerTimeout = setTimeout(() => {
+        if (answered[currentQuestion] === null) {
+          checkAnswer(null, true);
+        }
+      }, 20000);
+    }
+
+    function clearTimers() {
+      if (timerInterval) clearInterval(timerInterval);
+      if (timerTimeout) clearTimeout(timerTimeout);
+    }
+
+    function checkAnswer(selected, isTimeout = false) {
+      clearTimers();
+      if (answered[currentQuestion] !== null) return;
+      answered[currentQuestion] = selected;
+      if (selected === currentQuiz[currentQuestion].answer) score++;
+      showFeedback(selected, isTimeout);
+
+      const nextBtn = document.createElement('button');
+      nextBtn.id = "next-btn";
+      if (currentQuestion < currentQuiz.length - 1) {
+        nextBtn.textContent = "Next";
+        nextBtn.onclick = function () {
+          currentQuestion++;
+          showQuestion();
+        };
+        setTimeout(() => {
+          if (document.getElementById('next-btn')) document.getElementById('next-btn').click();
+        }, 1000);
+      } else {
+        // If not last level, show "Go Next Level" button
+        if (currentLevel < quizzes[currentDepartment].length - 1) {
+          nextBtn.textContent = "Go Next Level";
+          nextBtn.onclick = function () {
+            selectLevel(currentLevel + 1);
+          };
+        } else {
+          // If last level, show only score
+          nextBtn.textContent = "Show Score";
+          nextBtn.onclick = function () {
+            showScore();
+          };
+        }
+      }
+      document.getElementById('question-container').appendChild(nextBtn);
+    }
+
+    function showFeedback(selected, isTimeout = false) {
+      const q = currentQuiz[currentQuestion];
+      const feedback = document.getElementById('feedback');
+      const explanation = document.getElementById('explanation');
+      if (selected === q.answer) {
+        feedback.innerHTML = `<span class="correct">Correct!</span>`;
+      } else if (selected === null && isTimeout) {
+        feedback.innerHTML = `<span class="wrong">Time's up!</span>`;
+      } else {
+        feedback.innerHTML = `<span class="wrong">Wrong!</span>`;
+      }
+      explanation.innerHTML = `<div class="explanation">${q.explanation}</div>`;
+      Array.from(document.querySelectorAll('.option-btn')).forEach(btn => btn.disabled = true);
+    }
+
+    function showScore() {
+      clearTimers();
+      let totalQuestions = currentQuiz.length;
+      let percent = Math.round((score / totalQuestions) * 100);
+
+      // Save score for this section if not already saved
+      let attempts = studentAttempts[currentStudent.name];
+      if (!attempts.some(a => a.section === currentDepartment)) {
+        attempts.push({
+          section: currentDepartment,
+          score: score,
+          total: totalQuestions,
+          percent: percent
+        });
+      }
+
+      document.getElementById('quiz-section').innerHTML = `
+        <h2>Quiz Completed!</h2>
+        <p style="font-size:1.3em;color:#4caf50;">Thank you, <b>${currentStudent.name}</b>.</p>
+        <div id="score-bar"><div id="score-fill"></div></div>
+        <p style="font-size:1.2em;color:#f8b500;">Your Score: <b>${score} / ${totalQuestions}</b> (${percent}%)</p>
+        <p>${percent >= 70 ? '<span style="color:#4caf50;font-weight:bold;">Great job!</span>' : '<span style="color:#e57373;font-weight:bold;">Keep practicing!</span>'}</p>
+        <button id="go-back-btn" style="margin-top:24px;padding:10px 24px;border-radius:8px;background:linear-gradient(90deg,#fed6e3 0%,#a8edea 100%);color:#333;font-weight:bold;font-size:1.1em;border:2px solid #fff;cursor:pointer;">Go Back</button>
+      `;
+      let fill = document.getElementById('score-fill');
+      fill.style.width = "0";
+      setTimeout(() => { fill.style.width = percent + "%"; }, 100);
+
+      document.getElementById('go-back-btn').onclick = function () {
+        document.getElementById('quiz-section').classList.add('hidden');
+        // If attempted 3 sections, show previous scores and block further access
+        if (studentAttempts[currentStudent.name].length >= 3) {
+          showPreviousScores();
+        } else {
+          document.getElementById('login-section').classList.remove('hidden');
+          currentStudent = null;
+          currentDepartment = null;
+          currentLevel = 0;
+          currentQuiz = [];
+          currentQuestion = 0;
+          score = 0;
+          answered = [];
+        }
+      };
+    }
+
+    function showPreviousScores() {
+      let attempts = studentAttempts[currentStudent.name];
+      let scoresHtml = attempts.map(a =>
+        `<li><b>${a.section}</b>: ${a.score} / ${a.total} (${a.percent}%)</li>`
+      ).join('');
+      document.getElementById('login-section').innerHTML = `
+        <h2>Quiz Limit Reached</h2>
+        <p style="color:#e57373;font-weight:bold;">You have completed 3 sections.</p>
+        <h3>Your Scores:</h3>
+        <ul style="text-align:left;">${scoresHtml}</ul>
+        <button id="logout-btn" style="margin-top:24px;padding:10px 24px;border-radius:8px;background:linear-gradient(90deg,#fed6e3 0%,#a8edea 100%);color:#333;font-weight:bold;font-size:1.1em;border:2px solid #fff;cursor:pointer;">Logout</button>
+      `;
+      document.getElementById('login-section').classList.remove('hidden');
+      document.getElementById('department-section').classList.add('hidden');
+      document.getElementById('level-section').classList.add('hidden');
+      document.getElementById('quiz-section').classList.add('hidden');
+      document.getElementById('logout-btn').onclick = function () {
+        location.reload();
+      };
+      currentStudent = null;
+      currentDepartment = null;
+      currentLevel = 0;
+      currentQuiz = [];
+      currentQuestion = 0;
+      score = 0;
+      answered = [];
+    }
+  </script>
+</body>
+
+</html>
